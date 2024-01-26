@@ -2,15 +2,15 @@ import { browser } from '$app/environment';
 import { readFromLocalStorage, writeToLocalStorage } from '$lib/localstorage/index.js';
 import { writable } from 'svelte/store';
 
-function addWindowEventListener(
+function addWindowEventListener<T>(
 	key: string,
-	set: (this: void, value: unknown) => void,
-	fallback: unknown
+	set: (this: void, value: T) => void,
+	fallback: T
 ) {
 	if (!browser) return;
 	if (!window) return;
 
-	const update = () => set(readFromLocalStorage(key, fallback));
+	const update = () => set(readFromLocalStorage<T>(key, fallback));
 
 	window.addEventListener('storage', ({ storageArea }) => {
 		if (!storageArea || storageArea !== localStorage) return;
@@ -20,15 +20,15 @@ function addWindowEventListener(
 	document.addEventListener('internalLocalStorageChange', update);
 }
 
-export function localstorage(key: string, fallback: unknown) {
+export function localstorage<T>(key: string, fallback: T) {
 	const value = readFromLocalStorage(key, fallback);
 	const { subscribe, set } = writable(value);
 
-	addWindowEventListener(key, set, fallback);
+	addWindowEventListener<T>(key, set, fallback);
 
 	return {
 		subscribe,
-		set: (newValue: unknown) => {
+		set: (newValue: T) => {
 			set(newValue);
 
 			writeToLocalStorage(key, newValue);
