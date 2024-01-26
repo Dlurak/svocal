@@ -1,1 +1,1 @@
-// Reexport your entry components here
+export { localstorage } from './stores/localstorage.js';

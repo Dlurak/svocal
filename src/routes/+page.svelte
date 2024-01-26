@@ -1,3 +1,22 @@
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import { localstorage } from '$lib/index.js';
+
+	let store = localstorage('demo', 1);
+</script>
+
+<p>{$store}</p>
+<button
+	on:click={() => {
+		store.set($store + 1);
+	}}
+>
+	Inc
+</button>
+
+<button
+	on:click={() => {
+		window.localStorage.setItem('demo', `${$store + 1}`);
+	}}
+>
+	Increment directly (not through the store)
+</button>
