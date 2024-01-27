@@ -2,11 +2,7 @@ import { browser } from '$app/environment';
 import { readFromLocalStorage, writeToLocalStorage } from '$lib/localstorage/index.js';
 import { writable } from 'svelte/store';
 
-function addWindowEventListener<T>(
-	key: string,
-	set: (this: void, value: T) => void,
-	fallback: T
-) {
+function addWindowEventListener<T>(key: string, set: (this: void, value: T) => void, fallback: T) {
 	if (!browser) return;
 	if (!window) return;
 
@@ -20,6 +16,10 @@ function addWindowEventListener<T>(
 	document.addEventListener('internalLocalStorageChange', update);
 }
 
+/**
+ * A writeable store that autosyncs with localstorage
+ * It can also be used to sync state between multiple tabs/windows
+ */
 export function localstorage<T>(key: string, fallback: T) {
 	const value = readFromLocalStorage(key, fallback);
 	const { subscribe, set } = writable(value);
