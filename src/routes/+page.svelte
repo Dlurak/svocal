@@ -31,7 +31,7 @@
 				</button>
 				<button
 					on:click={() => {
-						store.set($store2 + 1);
+						store2.update((val) => val + 1);
 					}}
 				>
 					Increment store 2

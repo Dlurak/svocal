@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { readFromLocalStorage, writeToLocalStorage } from '$lib/localstorage/index.js';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 function addWindowEventListener<T>(key: string, set: (this: void, value: T) => void, fallback: T) {
 	if (!browser) return;
@@ -22,13 +22,21 @@ function addWindowEventListener<T>(key: string, set: (this: void, value: T) => v
  */
 export function localstorage<T>(key: string, fallback: T) {
 	const value = readFromLocalStorage(key, fallback);
-	const { subscribe, set } = writable(value);
+	const writableStore = writable(value);
+	const { subscribe, set } = writableStore;
 
 	addWindowEventListener<T>(key, set, fallback);
 
 	return {
 		subscribe,
 		set: (newValue: T) => {
+			set(newValue);
+
+			writeToLocalStorage(key, newValue);
+			document.dispatchEvent(new Event('internalLocalStorageChange'));
+		},
+		update: (newValueFn: (oldVal: T) => T) => {
+			const newValue = newValueFn(get(writableStore));
 			set(newValue);
 
 			writeToLocalStorage(key, newValue);
